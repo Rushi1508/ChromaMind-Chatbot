@@ -101,4 +101,4 @@ async def translate_text_endpoint(data: TranslationRequest):
 if __name__ == "__main__":
     import uvicorn
     logger.info("🚀 Starting FastAPI Server...")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000)
