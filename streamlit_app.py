@@ -15,7 +15,7 @@ user_name = st.sidebar.text_input("User Name", value="John Doe")
 
 if st.sidebar.button("Initialize User"):
     payload = {"user_id": user_id, "user_name": user_name}
-    response = requests.post(f"{API_URL}/initialize_user/", json=payload)
+    response = requests.post(f"{API_URL}/initialize_user/", json=payload, timeout=10)
     
     if response.status_code == 200:
         st.sidebar.success(response.json()["message"])
