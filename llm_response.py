@@ -29,7 +29,7 @@ def generate_llm_response(prompt: str):
     logging.debug(f"📤 Sending request to Groq API: {payload}")
 
     try:
-        response = requests.post(GROQ_API_URL, headers=headers, json=payload)
+        response = requests.post(GROQ_API_URL, headers=headers, json=payload, timeout=10)
         if response.status_code == 200:
             logging.debug(f"✅ Groq API Response: {response.json()}")
             return response.json()["choices"][0]["message"]["content"]
