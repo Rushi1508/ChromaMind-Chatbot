@@ -5,18 +5,18 @@ import os
 import logging
 import chromadb
 from sentence_transformers import SentenceTransformer
-from config.settings import CHROMA_DB_PATH
+from config.settings import CHROMA_DB_PATH, COLLECTION_NAME, FALLBACK_REPLY
 
 
 # Logging Setup
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 # Ensure ChromaDB directory exists
 os.makedirs(CHROMA_DB_PATH, exist_ok=True)
 
 # Initialize ChromaDB Client
 chroma_client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
-collection = chroma_client.get_or_create_collection("Assistant_knowledge")
+collection = chroma_client.get_or_create_collection(COLLECTION_NAME)
 
 # Load Embedding Model
 model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -24,11 +24,11 @@ model = SentenceTransformer("all-MiniLM-L6-v2")
 # ✅ Functions for Knowledge Base Management
 def add_knowledge(id: str, text: str, metadata: dict):
     """
-    Adds a new knowledge entry to ChromaDB.
+    Adds (or overwrites) a knowledge entry in ChromaDB.
     """
     try:
         embedding = model.encode(text).tolist()
-        collection.add(
+        collection.upsert(
             ids=[id],
             documents=[text],
             metadatas=[metadata],
@@ -70,10 +70,10 @@ def query_knowledge(query_text: str, n_results: int = 3):
         logging.debug(f"🔍 ChromaDB Query Results: {results}")
 
         if results.get("documents") and results["documents"][0]:
-            return results["documents"][0]  # Return the most relevant document
+            return results["documents"][0]  # Top n_results documents, most relevant first
 
         logging.warning("⚠️ No relevant knowledge found.")
-        return "I am still learning. Can you ask something related to Assistant?"
+        return FALLBACK_REPLY
     except Exception as e:
         logging.error(f"❌ Query Error: {str(e)}")
         return {"error": f"❌ Failed to query knowledge: {str(e)}"}

@@ -3,7 +3,7 @@ Handles Groq API integration for LLM responses.
 """
 import logging
 import requests
-from settings import GROQ_API_KEY
+from config.settings import GROQ_API_KEY, GROQ_MODEL, SYSTEM_PROMPT
 
 # Groq API Endpoint
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
@@ -17,14 +17,14 @@ def generate_llm_response(prompt: str):
         "Content-Type": "application/json"
     }
     payload = {
-        "model": "llama-3.1-8b-instant",
+        "model": GROQ_MODEL,
         "messages": [
-            {"role": "system", "content": "You are an AI assistant for Assistant. Generate natural, human-like responses."},
+            {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt}
         ],
         "max_tokens": 150,
         "temperature": 0.7
-         }
+    }
 
     logging.debug(f"📤 Sending request to Groq API: {payload}")
 
